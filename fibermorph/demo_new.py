@@ -88,6 +88,7 @@ class Demo(Fibermorph):
 
 
     def get_data(self, path, im_type):
+        #honestly probably do not need to use path class and can just use string, will need to double check first though
         fiblog = self.get_logger('fiblog')
         datadir = pathlib.Path(path)
         datadir = self.make_directory(datadir, "tmpdata", fiblog)
@@ -97,8 +98,16 @@ class Demo(Fibermorph):
             urllist = self.url_files(im_type)
 
             self.download_im(tmpdir, urllist)
-            return tmpdir
+            
+            img_file = ""
+            if im_type == "curv":
+                img_file = "004_demo_curv.tiff"
+            elif im_type == "section":
+                img_file = "140918_demo_section.tiff"
 
+            return tmpdir.joinpath(img_file)
+
+        #Not really sure what this else is for to be honest
         else:
             typelist = ["curv", "section"]
             for im_type in typelist:
@@ -293,7 +302,6 @@ class Demo(Fibermorph):
         fibermorph_demo_dir = self.create_results_cache(path)
 
         input_directory = self.get_data(fibermorph_demo_dir, "curv")
-        print(input_directory)
         jetzt = datetime.now()
         timestamp = jetzt.strftime("%b%d_%H%M_")
         testname = str(timestamp + "DemoTest_Curv")
@@ -329,10 +337,10 @@ class Demo(Fibermorph):
         testname = str(timestamp + "DemoTest_Section")
 
         output_dir = self.make_directory(fibermorph_demo_dir, testname, fiblog)
-
+        print(input_directory)
         from section import Section
         sect = Section()
-        sect.section_seq(input_directory, output_dir, resolution=1.06, minsize=20, maxsize=150, save_img=True)
+        sect.section_seq(input_directory.__str__(), output_dir.__str__(), resolution_mu=1.06, minsize=20, maxsize=150, save_img=True, fiblog=fiblog)
 
         tqdm.write("\n\nDemo data for fibermorph section are in {}\n\nDemo results are in {}\n\n".format(input_directory, output_dir))
 
